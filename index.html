@@ -8,34 +8,41 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-  <div style="text-align: center; margin-top: 50px;">
-    <p>認証中...しばらくお待ちください。</p>
+  <div style="text-align: center; margin-top: 50px; font-family: sans-serif; color: #333;">
+    <p style="font-size: 16px;">日報システムに接続中...<br>しばらくお待ちください。</p>
   </div>
 
   <script>
-    // ⭐️ あなたのLIFF IDをここに貼り付けます
-    const LIFF_ID = "YOUR_LIFF_ID_HERE";
-    // ⭐️ あなたのGoogleフォームのURL（「送信」から取得できる回答用URL）をここに貼り付けます
-    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1G5UF4CQo2SlHn2WkC95od-XEgPy-scQwbLFYP0iHp3E/viewform";
+    // ⭐️ LINE DevelopersのLIFF画面に表示されている「LIFF ID」を、以下の" " の中に貼り付けてください
+    const LIFF_ID = "ここにあなたのLIFF ID（例: 20xxxxxx-xxxxxx）を貼り付けます";
+
+    // ご提示いただいたGoogleフォームのURLと鍵穴番号を完全に組み込みました
+    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfH4GsxmXC8uxw_qxB01p7tNJxLFTKj4Glu0-cAxcfQxqCUYQ/viewform";
 
     async function main() {
+      // LIFFの初期化
       await liff.init({ liffId: LIFF_ID });
       
+      // LINEでログインしていなければログイン画面へ誘導
       if (!liff.isLoggedIn()) {
-        liff.login(); // LINEでログインしていない場合はログイン画面を出す
+        liff.login();
       } else {
-        // ログイン成功後、ユーザープロフィールを取得
+        // ログイン成功後、送信者のLINEプロフィールからユーザーIDを取得
         const profile = await liff.getProfile();
-        const userId = profile.userId; // ⭐️ ここでLINEユーザーID（Uxxxx）を確実に取得！
+        const userId = profile.userId;
 
-        // LINEユーザーIDをGoogleフォームの特定の質問（テキスト入力欄）に自動入力させて遷移
-        // ※ entry.XXXXX 部分は、ご自身のGoogleフォームの該当質問の入力IDに変更する必要があります
-        const redirectUrl = `${GOOGLE_FORM_URL}?entry.123456789=${encodeURIComponent(userId)}`;
+        // LINEユーザーIDを指定の入力欄（entry.1404184595）に自動で埋め込んだURLを作成
+        const redirectUrl = `${GOOGLE_FORM_URL}?usp=pp_url&entry.1404184595=${encodeURIComponent(userId)}`;
         
+        // 自動入力された状態のGoogleフォームへ瞬間移動（リダイレクト）
         window.location.href = redirectUrl;
       }
     }
-    main();
+    
+    // プログラムの実行
+    main().catch((err) => {
+      console.error("LIFF初期化エラー:", err);
+    });
   </script>
 </body>
 </html>
